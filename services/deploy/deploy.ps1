@@ -83,6 +83,8 @@ Function SelectEnvironment() {
                     -ManagementPortalUrl http://go.microsoft.com/fwlink/?LinkId=254433
             }
             $script:locations = @("East US", "West US 2", "North Europe", "West Europe", "Canada Central", "Central India", "Southeast Asia")
+            $script:AzureKeyVaultWellKnownAppId='cfa8b339-82a2-471a-a3c9-0fc0be7a4093'
+            $script:MicrosoftGraphWellKnownAppId='00000003-0000-0000-c000-000000000000'
         }
         default {
             throw ("'{0}' is not a supported Azure Cloud environment" -f $script:environmentName)
@@ -598,11 +600,11 @@ Function GetAzureADApplicationConfig() {
         
         $requiredResourcesAccess = `
             New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Azure Key Vault" `
+        $requiredPermissions = GetRequiredPermissions -appId $script:AzureKeyVaultWellKnownAppId `
             -requiredDelegatedPermissions "user_impersonation"
         $requiredResourcesAccess.Add($requiredPermissions)
-        $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
-            -requiredDelegatedPermissions "User.Read" 
+        $requiredPermissions = GetRequiredPermissions -appId $script:MicrosoftGraphWellKnownAppId `
+            -requiredDelegatedPermissions "User.Read"
         $requiredResourcesAccess.Add($requiredPermissions)
         
         Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId `
